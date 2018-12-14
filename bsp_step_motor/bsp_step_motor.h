@@ -23,29 +23,38 @@ typedef struct
 {
 	TIM_HandleTypeDef* timer; /*<! timer that motor used */
 	uint32_t channel;         /*<! channel that motor used*/
-	GPIO_TypeDef* gpiox;      /*<! gpio that motor used */
-	uint16_t pinx;
+	GPIO_TypeDef* dir_gpiox;      /*<! direction gpio that motor used */
+	uint16_t dir_pinx;
+	GPIO_TypeDef* drv_en_gpiox;      /*<! driver enable gpio that motor used */
+	uint16_t drv_en_pinx;
 	
 	uint32_t apb_timer_clocks;
-	uint32_t pwm_frequncy;
+	uint32_t pwm_resolution;
 	uint16_t subdivision;     /*<! the needed pulses for one circle */
 	uint32_t pulse_cnt;
 	uint8_t rotate_ok_flag;
+	uint8_t step_pos;
 	uint32_t laps;
 	void (*f_forward) (GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 	void (*f_back) (GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+	void (*f_enable_driver) (GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+	void (*f_disable_driver) (GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 }step_motor_t;
 
 void step_motor_init( step_motor_t* step_motor, 
 											TIM_HandleTypeDef* tim, 
 											uint32_t chan, 
-											GPIO_TypeDef* gpio, 
-											uint16_t pin, 
+											GPIO_TypeDef* dir_gpio, 
+											uint16_t dir_pin,
+											GPIO_TypeDef* drv_en_gpio,      
+											uint16_t drv_en_pin,
 											uint32_t apb_freq, 
-											uint32_t pwm_freq, 
+											uint32_t pwm_reso, 
 											uint16_t subd);
 void step_motor_forward(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void step_motor_back(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void enable_driver(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void disable_driver(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void step_motor_ctrl(step_motor_t* step_motor, float r_speed, uint32_t lap);
 void step_motor_pulse_cnt(step_motor_t* step_motor);
 
