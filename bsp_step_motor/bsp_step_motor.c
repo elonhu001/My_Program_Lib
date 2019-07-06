@@ -2,10 +2,28 @@
   ******************************************************************************
   * @file    bsp_step_motor.c
   * @author  elon hu
-  * @tiem    2018-12-11
+  * @date    2018-12-11
   * @brief   step motor driver.
   *          This file provides firmware functions to manage the functionalities
   *          of the step motor.
+	* @verbatim
+  ==============================================================================
+                        ##### How to use this driver #####
+  ==============================================================================
+	* step1: define a structure for a step motor
+	* -@-    step_motor_t step_motor_break;
+	* step2: put the function step_motor_pulse_cnt() into the corresponding time 
+	* 			 global interrupt function of PWM wave. The interrupt function will be 
+	*				 find in stm32f4xx_it.c file.
+	* -@-    void TIM3_IRQHandler(void)
+	*	-@-		 {
+	*	-@-				step_motor_pulse_cnt(&step_motor_up_down);
+	*	-@-		 }
+	* step3: initiallize for the step motor.
+	*	-@-    step_motor_init(&step_motor_break, &htim2, TIM_CHANNEL_2, GPIOC,  \
+	*        GPIO_PIN_0, GPIOB, GPIO_PIN_14, APB1_TIMER_CLOCKS, PWM_RESOLUTION, SUBDIVISION);
+	* step4: use the control function.
+	*	-@-    step_motor_ctrl(&step_motor_break, -2, 0);
   ******************************************************************************
   */ 
 
@@ -209,23 +227,3 @@ void step_motor_pulse_cnt(step_motor_t* step_motor)
 		}
 }
 
-
-
- /**************************************************How to use**************************************************/
- step_motor_t step_motor_break;
- step_motor_init(&step_motor_break, &htim2, TIM_CHANNEL_2, GPIOC, GPIO_PIN_0, GPIOB, GPIO_PIN_14, APB1_TIMER_CLOCKS, PWM_RESOLUTION, SUBDIVISION);
- step_motor_ctrl(&step_motor_break, -2, 0);//刹车，反转
- 
- /**
-* @brief This function handles TIM3 global interrupt. used in stm32f4xx_it.c
-*/
-void TIM3_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM3_IRQn 0 */
-	step_motor_pulse_cnt(&step_motor_up_down);
-  /* USER CODE END TIM3_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim3);
-  /* USER CODE BEGIN TIM3_IRQn 1 */
-
-  /* USER CODE END TIM3_IRQn 1 */
-}
