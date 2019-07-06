@@ -17,8 +17,8 @@
 	* @param[in\out]  step_motor: the structure of the motor to be used.
 	* @param[in]      tim: timer that motor used.
 	* @param[in]      chan: channel that motor used.
-	* @param[in]      gpio: gpio that motor used.
-	* @param[in]      pin: gpio that motor used.
+	* @param[in]      gpio: gpio that motor used for direction.
+	* @param[in]      pin: gpio that motor used for direction.
 	* @param[in]      apb_freq: the main frequncy of timer that be used.
 	* @param[in]      pwm_freq: the default pwm frequncy to be set.
 	* @param[in]      subd: the subdivision that motor used.
@@ -209,3 +209,23 @@ void step_motor_pulse_cnt(step_motor_t* step_motor)
 		}
 }
 
+
+
+ /**************************************************How to use**************************************************/
+ step_motor_t step_motor_break;
+ step_motor_init(&step_motor_break, &htim2, TIM_CHANNEL_2, GPIOC, GPIO_PIN_0, GPIOB, GPIO_PIN_14, APB1_TIMER_CLOCKS, PWM_RESOLUTION, SUBDIVISION);
+ step_motor_ctrl(&step_motor_break, -2, 0);//刹车，反转
+ 
+ /**
+* @brief This function handles TIM3 global interrupt. used in stm32f4xx_it.c
+*/
+void TIM3_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+	step_motor_pulse_cnt(&step_motor_up_down);
+  /* USER CODE END TIM3_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim3);
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+
+  /* USER CODE END TIM3_IRQn 1 */
+}

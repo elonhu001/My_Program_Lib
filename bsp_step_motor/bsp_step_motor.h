@@ -17,7 +17,7 @@
 #define TIM_PSC_APB1 ((APB1_TIMER_CLOCKS/PWM_FREQUENCE)/PWM_RESOLUTION) /*<! the prescaler of timer */
 #define APB1_TIMER_CLOCKS 90000000                                      /*<! the clock frequncy of timer */
 
-#define SUBDIVISION (400)//20000
+#define SUBDIVISION (400)//20000//the pulses for a circle
 
 typedef struct
 {
