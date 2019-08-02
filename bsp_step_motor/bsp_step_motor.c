@@ -163,6 +163,9 @@ void step_motor_ctrl(step_motor_t* step_motor, float r_speed, uint32_t lap)
 			}
 			else if(r_speed == 0)
 			{
+				step_motor->rotate_ok_flag = 0;
+				step_motor->pulse_cnt = 0;
+				step_motor->laps = 0;
 				step_motor->f_disable_driver(step_motor->drv_en_gpiox, step_motor->drv_en_pinx);
 				HAL_TIM_PWM_Stop_IT(step_motor->timer,step_motor->channel);
 			}
@@ -196,6 +199,9 @@ void step_motor_ctrl(step_motor_t* step_motor, float r_speed, uint32_t lap)
 		}
 		else if(r_speed == 0)
 		{
+			step_motor->rotate_ok_flag = 0;
+			step_motor->pulse_cnt = 0;
+			step_motor->laps = 0;
 			step_motor->f_disable_driver(step_motor->drv_en_gpiox, step_motor->drv_en_pinx);
 			HAL_TIM_PWM_Stop(step_motor->timer,step_motor->channel);
 		}
@@ -213,17 +219,48 @@ void step_motor_ctrl(step_motor_t* step_motor, float r_speed, uint32_t lap)
 	*/
 void step_motor_pulse_cnt(step_motor_t* step_motor)
 {
-	if(__HAL_TIM_GET_IT_SOURCE(step_motor->timer ,TIM_IT_CC2 )!=RESET )
+	switch (step_motor->channel)
+	{
+		case TIM_CHANNEL_1:
 		{
-			step_motor->pulse_cnt++;
-		}
-		__HAL_TIM_CLEAR_IT(step_motor->timer ,TIM_IT_CC2 );
+			if(__HAL_TIM_GET_IT_SOURCE(step_motor->timer ,TIM_IT_CC1 )!=RESET )
+				{
+					step_motor->pulse_cnt++;
+				}
+				__HAL_TIM_CLEAR_IT(step_motor->timer ,TIM_IT_CC1 );
+		}break;
+		case TIM_CHANNEL_2:
+		{
+			if(__HAL_TIM_GET_IT_SOURCE(step_motor->timer ,TIM_IT_CC2 )!=RESET )
+				{
+					step_motor->pulse_cnt++;
+				}
+				__HAL_TIM_CLEAR_IT(step_motor->timer ,TIM_IT_CC2 );
+		}break;
+		case TIM_CHANNEL_3:
+		{
+			if(__HAL_TIM_GET_IT_SOURCE(step_motor->timer ,TIM_IT_CC3 )!=RESET )
+				{
+					step_motor->pulse_cnt++;
+				}
+				__HAL_TIM_CLEAR_IT(step_motor->timer ,TIM_IT_CC3 );
+		}break;
+		case TIM_CHANNEL_4:
+		{
+			if(__HAL_TIM_GET_IT_SOURCE(step_motor->timer ,TIM_IT_CC4 )!=RESET )
+				{
+					step_motor->pulse_cnt++;
+				}
+				__HAL_TIM_CLEAR_IT(step_motor->timer ,TIM_IT_CC4 );
+		}break;
+		default: break;
+	}
 		
-		if(step_motor->pulse_cnt == step_motor->laps * step_motor->subdivision)
-		{
-			step_motor->rotate_ok_flag = 1;
-			step_motor->pulse_cnt = 0;
-			HAL_TIM_PWM_Stop_IT(step_motor->timer,step_motor->channel);
-		}
+	if(step_motor->pulse_cnt == step_motor->laps * step_motor->subdivision)
+	{
+		step_motor->rotate_ok_flag = 1;
+		step_motor->pulse_cnt = 0;
+		HAL_TIM_PWM_Stop_IT(step_motor->timer,step_motor->channel);
+	}
 }
 
